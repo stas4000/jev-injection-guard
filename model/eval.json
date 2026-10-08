@@ -1,0 +1,90 @@
+{
+ "run_at": "2026-10-09",
+ "base": "fastino/GLiNER2.5-Decide",
+ "adapter_sha256": "50a9158b3b3c12360f4ae75921c3048d1a257a5c7346c7684976a7e7fc49848c",
+ "trained_on": [
+  "data/boundary_train.jsonl (840)",
+  "data/deepset_train.jsonl (546)"
+ ],
+ "jev_labels_used": false,
+ "base_untuned": {
+  "boundary": {
+   "n": 240,
+   "injections": 120,
+   "latency_p50_s": 0.032,
+   "bar0.5": {
+    "precision": 0.916,
+    "recall": 1.0,
+    "f1": 0.956,
+    "false_flags": 0.092,
+    "accuracy": 0.954
+   },
+   "bar0.9": {
+    "precision": 0.991,
+    "recall": 0.942,
+    "f1": 0.966,
+    "false_flags": 0.008,
+    "accuracy": 0.967
+   }
+  },
+  "deepset": {
+   "n": 116,
+   "injections": 60,
+   "latency_p50_s": 0.032,
+   "bar0.5": {
+    "precision": 0.868,
+    "recall": 0.55,
+    "f1": 0.673,
+    "false_flags": 0.089,
+    "accuracy": 0.724
+   },
+   "bar0.9": {
+    "precision": 1.0,
+    "recall": 0.083,
+    "f1": 0.154,
+    "false_flags": 0.0,
+    "accuracy": 0.526
+   }
+  }
+ },
+ "tuned": {
+  "boundary": {
+   "n": 240,
+   "injections": 120,
+   "latency_p50_s": 0.033,
+   "bar0.5": {
+    "precision": 1.0,
+    "recall": 0.992,
+    "f1": 0.996,
+    "false_flags": 0.0,
+    "accuracy": 0.996
+   },
+   "bar0.9": {
+    "precision": 1.0,
+    "recall": 0.992,
+    "f1": 0.996,
+    "false_flags": 0.0,
+    "accuracy": 0.996
+   }
+  },
+  "deepset": {
+   "n": 116,
+   "injections": 60,
+   "latency_p50_s": 0.033,
+   "bar0.5": {
+    "precision": 0.965,
+    "recall": 0.917,
+    "f1": 0.94,
+    "false_flags": 0.036,
+    "accuracy": 0.94
+   },
+   "bar0.9": {
+    "precision": 0.965,
+    "recall": 0.917,
+    "f1": 0.94,
+    "false_flags": 0.036,
+    "accuracy": 0.94
+   }
+  }
+ }
+}

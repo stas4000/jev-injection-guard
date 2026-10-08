@@ -31,6 +31,28 @@ Zero false flags on both backends. Most of what Jev lets through here is labeled
 
 Cost and speed for Jev on every text: 83,834 input tokens for the 240 texts, $0.0035 at $0.042 per million, so about **$0.015 per 1,000 texts**. 136.6 ms median per request of 8 texts, 161.3 ms p95. The rules alone take 0.16 to 0.36 ms per text.
 
+## Local model: open weights, no API
+
+`model/` holds a 31.8 MB LoRA adapter for [fastino/GLiNER2.5-Decide](https://huggingface.co/fastino/GLiNER2.5-Decide) (Apache-2.0), trained on the train splits of the two public sets above and nothing else: the labels are the datasets' own. It runs offline on a laptop, about 35 ms per text on an M4 Pro. Training takes about 8 minutes (`model/train_guard.py`, 360 steps).
+
+Same held-out test splits as the tables above, verdict at p ≥ 0.5 (`model/eval.json`):
+
+| | Agent attacks F1 | Agent false flags | Classic F1 | Classic false flags |
+|---|---|---|---|---|
+| Jev on every text | 0.956 | 9.2% | 0.710 | 0% |
+| GLiNER2.5-Decide, untuned | 0.956 | 9.2% | 0.673 | 8.9% |
+| **Local adapter** | **0.996** | **0%** | **0.940** | 3.6% |
+
+Agent attacks: 119 of 120 caught, no benign look-alike flagged. Classic set: 55 of 60 caught (Jev 33), 2 of 56 benign prompts flagged.
+
+```python
+from model.load_guard import load            # pip install gliner2 safetensors
+m = load("model")                            # base model + adapter folded in
+r = m.classify_text(text, {"injection": {"labels": ["injection", "benign"]}}, include_confidence=True)
+```
+
+Limits: train and test splits come from the same two datasets, so these are in-distribution scores. On text unlike them (long web pages, languages other than English and German) expect less, and keep the rules and a second opinion on anything that blocks a source.
+
 ## What the rules look for
 
 `rules.py`, standard library regular expressions, each hit with its family, weight and exact span:
@@ -93,4 +115,4 @@ python3 guard.py scan ~/code --backend cmd:"python3 my_model.py"
 
 ## Data and license
 
-Code: MIT. Test data: deepset/prompt-injections and 3nesdeniz/agentic-prompt-injection-boundary-pairs, both CC-BY-4.0, downloaded by `fetch_data.py` from the Hugging Face datasets server. Built with Claude Opus 5.5.
+Code and the adapter in `model/`: MIT; the adapter is built on fastino/GLiNER2.5-Decide (Apache-2.0). Data: deepset/prompt-injections and 3nesdeniz/agentic-prompt-injection-boundary-pairs, both CC-BY-4.0, downloaded by `fetch_data.py` from the Hugging Face datasets server. Built with Claude Opus 5.5.

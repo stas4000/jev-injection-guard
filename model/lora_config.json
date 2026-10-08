@@ -1,0 +1,14 @@
+{
+  "use_lora": true,
+  "lora_r": 16,
+  "lora_alpha": 32.0,
+  "lora_dropout": 0.0,
+  "lora_target_modules": [
+    "encoder",
+    "span_rep",
+    "classifier",
+    "count_embed",
+    "count_pred"
+  ],
+  "merged": true
+}
