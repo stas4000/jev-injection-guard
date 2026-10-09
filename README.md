@@ -67,6 +67,10 @@ r = m.classify_text(text, {"injection": {"labels": ["injection", "benign"]}}, in
 
 Limits: train and test splits come from the same two datasets, so these are in-distribution scores. On text unlike them (long web pages, languages other than English and German) expect less, and keep the rules and a second opinion on anything that blocks a source.
 
+## Sneaky inputs
+
+Hidden text in HTML, poisoned MCP tool results and poisoned skills, one run on 164 inputs: [bench/sneaky-inputs](bench/sneaky-inputs). Fed the text an agent reads, hidden parts included, it caught 60 of 60 hidden HTML attacks and 12 of 12 poisoned tool results, about 65 ms per input on a MacBook Pro M5. Clean full pages (28 of 64) and clean skills (8 of 10) still get flagged too often: it learned on short texts.
+
 ## What the rules look for
 
 `rules.py`, standard library regular expressions, each hit with its family, weight and exact span:
