@@ -1,8 +1,21 @@
-# Jev Injection Guard
+# OpenBles Firewall 1
 
-Finds prompt injection in text an AI agent is about to read: web pages, tool results, MCP responses, emails, files. Jev, a decision model, makes one yes/no call per text, with pattern hits and hidden-text decoding as evidence. A Claude Code hook in this repo withholds a poisoned tool result before the model reads it and blocks the source that sent it.
+A new open decision model that works as a prompt injection firewall for AI agents. It reads the text an agent is about to read (a web page, a tool or MCP result, an email, a file) and answers one question: is this text trying to give the agent orders?
 
-Jev returns a probability, never text, so an injected page cannot talk its way into the answer.
+- **Open weights, in this repo:** `model/` holds the 31.8 MB adapter, the loader, and the training and eval scripts. MIT.
+- **Runs offline:** about 33 ms per text on a laptop, no API key.
+- **Measured on public held-out texts:** 119 of 120 attacks on agents caught with 0 clean texts flagged (F1 0.996), 55 of 60 classic injections caught (F1 0.940).
+- **Trained on public human-labelled data only**, 8 minutes on a MacBook. Base model: [fastino/GLiNER2.5-Decide](https://huggingface.co/fastino/GLiNER2.5-Decide) (Apache-2.0).
+
+```python
+from model.load_guard import load            # pip install gliner2 safetensors
+m = load("model")
+m.classify_text(text, {"injection": {"labels": ["injection", "benign"]}})
+```
+
+The repo also ships the full guard around the model: rules for hidden text, a Claude Code hook that withholds a poisoned tool result and blocks its source, and an optional hosted backend (Jev) scored on the same sets below.
+
+OpenBles is the name of everything Bles Software releases in the open. How the names work: [docs/NAMING.md](docs/NAMING.md). This repo was called `jev-injection-guard` until 9 Oct 2026; old links redirect.
 
 ## Measured
 
@@ -31,7 +44,7 @@ Zero false flags on both backends. Most of what Jev lets through here is labeled
 
 Cost and speed for Jev on every text: 83,834 input tokens for the 240 texts, $0.0035 at $0.042 per million, so about **$0.015 per 1,000 texts**. 136.6 ms median per request of 8 texts, 161.3 ms p95. The rules alone take 0.16 to 0.36 ms per text.
 
-## Local model: open weights, no API
+## OpenBles Firewall 1: open weights, no API
 
 `model/` holds a 31.8 MB LoRA adapter for [fastino/GLiNER2.5-Decide](https://huggingface.co/fastino/GLiNER2.5-Decide) (Apache-2.0), trained on the train splits of the two public sets above and nothing else: the labels are the datasets' own. It runs offline on a laptop, about 35 ms per text on an M4 Pro. Training takes about 8 minutes (`model/train_guard.py`, 360 steps).
 
@@ -41,7 +54,7 @@ Same held-out test splits as the tables above, verdict at p ≥ 0.5 (`model/eval
 |---|---|---|---|---|
 | Jev on every text | 0.956 | 9.2% | 0.710 | 0% |
 | GLiNER2.5-Decide, untuned | 0.956 | 9.2% | 0.673 | 8.9% |
-| **Local adapter** | **0.996** | **0%** | **0.940** | 3.6% |
+| **OpenBles Firewall 1** | **0.996** | **0%** | **0.940** | 3.6% |
 
 Agent attacks: 119 of 120 caught, no benign look-alike flagged. Classic set: 55 of 60 caught (Jev 33), 2 of 56 benign prompts flagged.
 
