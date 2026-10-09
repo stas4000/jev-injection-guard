@@ -3,6 +3,7 @@
 A new open decision model that works as a prompt injection firewall for AI agents. It reads the text an agent is about to read (a web page, a tool or MCP result, an email, a file) and answers one question: is this text trying to give the agent orders?
 
 - **Open weights, in this repo:** `model/` holds the 31.8 MB adapter, the loader, and the training and eval scripts. MIT.
+- **On Hugging Face:** [openbles/firewall-1](https://huggingface.co/openbles/firewall-1), the same weights with a model card and a loader that pulls them from the hub.
 - **Runs offline:** about 33 ms per text on a laptop, no API key.
 - **Measured on public held-out texts:** 119 of 120 attacks on agents caught with 0 clean texts flagged (F1 0.996), 55 of 60 classic injections caught (F1 0.940).
 - **Trained on public human-labelled data only**, 8 minutes on a MacBook. Base model: [fastino/GLiNER2.5-Decide](https://huggingface.co/fastino/GLiNER2.5-Decide) (Apache-2.0).
